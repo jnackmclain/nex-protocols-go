@@ -17,7 +17,7 @@ import (
 	"math/rand"
 	"strconv"
 
-	"github.com/PretendoNetwork/nex-go"
+	"github.com/ihatecompvir/nex-go"
 	"github.com/PretendoNetwork/nex-protocols-go"
 )
 

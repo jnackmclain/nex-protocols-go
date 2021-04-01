@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	nex "github.com/PretendoNetwork/nex-go"
+	nex "github.com/ihatecompvir/nex-go"
 )
 
 const (
@@ -262,9 +262,9 @@ func (authenticationProtocol *AuthenticationProtocol) handleRequestTicket(packet
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
 
 	userPID := parametersStream.ReadUInt32LE()
-	serverPID := parametersStream.ReadUInt32LE()
+	serverPID := parametersStream.ReadUInt8()
 
-	go authenticationProtocol.RequestTicketHandler(nil, client, callID, userPID, serverPID)
+	go authenticationProtocol.RequestTicketHandler(nil, client, callID, userPID, uint32(serverPID))
 }
 
 func (authenticationProtocol *AuthenticationProtocol) handleGetPID(packet nex.PacketInterface) {

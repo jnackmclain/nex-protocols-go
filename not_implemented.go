@@ -1,6 +1,6 @@
 package nexproto
 
-import nex "github.com/PretendoNetwork/nex-go"
+import nex "github.com/ihatecompvir/nex-go"
 
 func respondNotImplemented(packet nex.PacketInterface, protocolID uint8) {
 	client := packet.Sender()
@@ -12,11 +12,8 @@ func respondNotImplemented(packet nex.PacketInterface, protocolID uint8) {
 	rmcResponseBytes := rmcResponse.Bytes()
 
 	var responsePacket nex.PacketInterface
-	if packet.Version() == 1 {
-		responsePacket, _ = nex.NewPacketV1(client, nil)
-	} else {
-		responsePacket, _ = nex.NewPacketV0(client, nil)
-	}
+
+	responsePacket, _ = nex.NewPacketV0(client, nil)
 
 	responsePacket.SetVersion(packet.Version())
 	responsePacket.SetSource(packet.Destination())

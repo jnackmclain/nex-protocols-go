@@ -1,6 +1,6 @@
 package nexproto
 
-import nex "github.com/PretendoNetwork/nex-go"
+import nex "github.com/ihatecompvir/nex-go"
 
 /*
 	NEX and Rendez-Vous have multiple protocols for match making
