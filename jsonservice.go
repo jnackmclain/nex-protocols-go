@@ -1,8 +1,10 @@
 package nexproto
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -15,7 +17,7 @@ const (
 	JsonRequest = 0x1
 )
 
-// SecureProtocol handles the Secure Connection nex protocol
+// JsonProtocol handles the Json requests
 type JsonProtocol struct {
 	server              *nex.Server
 	ConnectionIDCounter *nex.Counter
@@ -74,6 +76,32 @@ func (jsonProtocol *JsonProtocol) handleRequest(packet nex.PacketInterface) {
 	}
 
 	go jsonProtocol.JSONRequestHandler(nil, client, callID, rawJson)
+}
+
+func (jsonProtocol *JsonProtocol) RouteJSONRequest(rawJson string) string {
+
+	var decodedJson [][]interface{}
+	json.Unmarshal([]byte(rawJson), &decodedJson)
+
+	// structure is just an array of arrays for most if not all methods and the first is always the method name
+	methodName := decodedJson[0][0]
+
+	switch methodName {
+	case "config/get":
+		content, jsonErr := ioutil.ReadFile("E:/GitHub Projects/GoCentral/motd.json")
+		if jsonErr != nil {
+			panic(jsonErr)
+		}
+
+		return string(content)
+	case "misc/get_accounts_web_linked_status":
+		return "[[\"misc/get_accounts_web_linked_status\", \"dd\", [\"pid\", \"linked\"], [[12345, 1]]]]"
+	case "misc/get_accounts_setlist_creation_status":
+		return "[[\"songlists/setlist_creator_status\", \"dd\", [\"pid\", \"creator\"], [[12345, 0]]]]"
+	}
+
+	return "A"
+
 }
 
 // NewSecureProtocol returns a new SecureProtocol
