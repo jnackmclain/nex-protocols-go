@@ -1,10 +1,8 @@
 package nexproto
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -13,8 +11,8 @@ const (
 	// SecureProtocolID is the protocol ID for the Secure Connection protocol
 	JsonProtocolID = 0x75
 
-	// SecureMethodRegister is the method ID for the method Register
-	JsonRequest = 0x1
+	JsonRequest  = 0x1
+	JsonRequest2 = 0x2 // ?
 )
 
 // JsonProtocol handles the Json requests
@@ -22,6 +20,7 @@ type JsonProtocol struct {
 	server              *nex.Server
 	ConnectionIDCounter *nex.Counter
 	JSONRequestHandler  func(err error, client *nex.Client, callID uint32, rawJson string)
+	JSONRequest2Handler func(err error, client *nex.Client, callID uint32, rawJson string)
 }
 
 // Setup initializes the protocol
@@ -35,6 +34,8 @@ func (jsonProtocol *JsonProtocol) Setup() {
 			switch request.MethodID() {
 			case JsonRequest:
 				go jsonProtocol.handleRequest(packet)
+			case JsonRequest2:
+				go jsonProtocol.handleRequest2(packet)
 			default:
 				fmt.Printf("Unsupported Secure method ID: %#v\n", request.MethodID())
 			}
@@ -45,6 +46,10 @@ func (jsonProtocol *JsonProtocol) Setup() {
 // Register sets the Register handler function
 func (jsonProtocol *JsonProtocol) JSONRequest(handler func(err error, client *nex.Client, callID uint32, rawJson string)) {
 	jsonProtocol.JSONRequestHandler = handler
+}
+
+func (jsonProtocol *JsonProtocol) JSONRequest2(handler func(err error, client *nex.Client, callID uint32, rawJson string)) {
+	jsonProtocol.JSONRequest2Handler = handler
 }
 
 func (jsonProtocol *JsonProtocol) handleRequest(packet nex.PacketInterface) {
@@ -63,7 +68,7 @@ func (jsonProtocol *JsonProtocol) handleRequest(packet nex.PacketInterface) {
 	parametersStream := NewStreamIn(parameters, jsonProtocol.server)
 
 	if len(parametersStream.Bytes()[parametersStream.ByteOffset():]) < 4 {
-		err := errors.New("[SecureProtocol::Register] Json missing length")
+		err := errors.New("[JsonProtocol::JSONRequest] Json missing length")
 		go jsonProtocol.JSONRequestHandler(err, client, callID, "")
 		return
 	}
@@ -78,30 +83,35 @@ func (jsonProtocol *JsonProtocol) handleRequest(packet nex.PacketInterface) {
 	go jsonProtocol.JSONRequestHandler(nil, client, callID, rawJson)
 }
 
-func (jsonProtocol *JsonProtocol) RouteJSONRequest(rawJson string) string {
-
-	var decodedJson [][]interface{}
-	json.Unmarshal([]byte(rawJson), &decodedJson)
-
-	// structure is just an array of arrays for most if not all methods and the first is always the method name
-	methodName := decodedJson[0][0]
-
-	switch methodName {
-	case "config/get":
-		content, jsonErr := ioutil.ReadFile("E:/GitHub Projects/GoCentral/motd.json")
-		if jsonErr != nil {
-			panic(jsonErr)
-		}
-
-		return string(content)
-	case "misc/get_accounts_web_linked_status":
-		return "[[\"misc/get_accounts_web_linked_status\", \"dd\", [\"pid\", \"linked\"], [[12345, 1]]]]"
-	case "misc/get_accounts_setlist_creation_status":
-		return "[[\"songlists/setlist_creator_status\", \"dd\", [\"pid\", \"creator\"], [[12345, 0]]]]"
+func (jsonProtocol *JsonProtocol) handleRequest2(packet nex.PacketInterface) {
+	if jsonProtocol.JSONRequestHandler == nil {
+		fmt.Println("[Warning] JsonProtocol::JSONRequest2 not implemented")
+		go respondNotImplemented(packet, SecureProtocolID)
+		return
 	}
 
-	return "A"
+	client := packet.Sender()
+	request := packet.RMCRequest()
 
+	callID := request.CallID()
+	parameters := request.Parameters()
+
+	parametersStream := NewStreamIn(parameters, jsonProtocol.server)
+
+	if len(parametersStream.Bytes()[parametersStream.ByteOffset():]) < 4 {
+		err := errors.New("[JsonProtocol::JSONRequest2] Json missing length")
+		go jsonProtocol.JSONRequest2Handler(err, client, callID, "")
+		return
+	}
+
+	rawJson, err := parametersStream.Read4ByteString()
+
+	if err != nil {
+		go jsonProtocol.JSONRequest2Handler(nil, client, callID, "[]")
+		return
+	}
+
+	go jsonProtocol.JSONRequest2Handler(nil, client, callID, rawJson)
 }
 
 // NewSecureProtocol returns a new SecureProtocol

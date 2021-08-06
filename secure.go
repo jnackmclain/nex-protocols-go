@@ -43,7 +43,7 @@ type SecureProtocol struct {
 	RegisterHandler              func(err error, client *nex.Client, callID uint32, stationUrls []*nex.StationURL)
 	RequestConnectionDataHandler func(err error, client *nex.Client, callID uint32, stationCID uint32, stationPID uint32)
 	RequestURLsHandler           func(err error, client *nex.Client, callID uint32, stationCID uint32, stationPID uint32)
-	RegisterExHandler            func(err error, client *nex.Client, callID uint32, stationUrls []*nex.StationURL, className string, ticketData []byte)
+	RegisterExHandler            func(err error, client *nex.Client, callID uint32, stationUrls []string, className string, ticketData []byte)
 	TestConnectivityHandler      func(err error, client *nex.Client, callID uint32)
 	UpdateURLsHandler            func(err error, client *nex.Client, callID uint32, stationUrls []*nex.StationURL)
 	ReplaceURLHandler            func(err error, client *nex.Client, callID uint32, oldStation *nex.StationURL, newStation *nex.StationURL)
@@ -98,7 +98,7 @@ func (secureProtocol *SecureProtocol) RequestURLs(handler func(err error, client
 }
 
 // RegisterEx sets the RegisterEx handler function
-func (secureProtocol *SecureProtocol) RegisterEx(handler func(err error, client *nex.Client, callID uint32, stationUrls []*nex.StationURL, className string, ticketData []byte)) {
+func (secureProtocol *SecureProtocol) RegisterEx(handler func(err error, client *nex.Client, callID uint32, stationUrls []string, className string, ticketData []byte)) {
 	secureProtocol.RegisterExHandler = handler
 }
 
@@ -224,26 +224,24 @@ func (secureProtocol *SecureProtocol) handleRegisterEx(packet nex.PacketInterfac
 
 	if len(parametersStream.Bytes()[parametersStream.ByteOffset():]) < 4 {
 		err := errors.New("[SecureProtocol::RegisterEx] Data missing list length")
-		go secureProtocol.RegisterExHandler(err, client, callID, make([]*nex.StationURL, 0), "", make([]byte, 0))
+		go secureProtocol.RegisterExHandler(err, client, callID, make([]string, 0), "", make([]byte, 0))
 		return
 	}
 
 	stationURLCount := parametersStream.ReadUInt32LE()
-	stationUrls := make([]*nex.StationURL, 0)
+	stationUrls := make([]string, 0)
 
 	for i := 0; i < int(stationURLCount); i++ {
-		stationString, err := parametersStream.ReadString()
+		stationString, err := parametersStream.Read4ByteString()
 
 		if err != nil {
 			go secureProtocol.RegisterExHandler(err, client, callID, stationUrls, "", make([]byte, 0))
 			return
 		}
-
-		station := nex.NewStationURL(stationString)
-		stationUrls = append(stationUrls, station)
+		stationUrls = append(stationUrls, stationString)
 	}
 
-	dataHolderType, err := parametersStream.ReadString()
+	dataHolderType, err := parametersStream.Read4ByteString()
 
 	if err != nil {
 		go secureProtocol.RegisterExHandler(err, client, callID, stationUrls, dataHolderType, make([]byte, 0))

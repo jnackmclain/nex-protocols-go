@@ -175,7 +175,9 @@ func (authenticationProtocol *AuthenticationProtocol) handleLogin(packet nex.Pac
 
 	parametersStream := nex.NewStreamIn(parameters, authenticationProtocol.server)
 
-	username, err := parametersStream.ReadString()
+	username, err := parametersStream.Read4ByteString()
+
+	fmt.Println(username)
 
 	if err != nil {
 		go authenticationProtocol.LoginHandler(err, client, callID, "")
