@@ -18,48 +18,7 @@ const (
 // AccountManagementProtocol handles the Account Management nex protocol
 type AccountManagementProtocol struct {
 	server                       *nex.Server
-	NintendoCreateAccountHandler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string, nintendoCreateAccountData *NintendoCreateAccountData)
-}
-
-// NintendoCreateAccountData contains data for creating a new NNID on the network
-type NintendoCreateAccountData struct {
-	NNAInfo  *NNAInfo
-	Token    string
-	Birthday *nex.DateTime
-	Unknown  uint64
-
-	hierarchy []nex.StructureInterface
-	nex.Structure
-}
-
-// ExtractFromStream extracts a NintendoCreateAccountData structure from a stream
-func (nintendoCreateAccountData *NintendoCreateAccountData) ExtractFromStream(stream *nex.StreamIn) error {
-	nnaInfoStructureInterface, err := stream.ReadStructure(NewNNAInfo())
-	if err != nil {
-		return err
-	}
-
-	nnaInfo := nnaInfoStructureInterface.(*NNAInfo)
-
-	token, err := stream.ReadString()
-	if err != nil {
-		return err
-	}
-
-	birthday := nex.NewDateTime(stream.ReadUInt64LE())
-	unknown := stream.ReadUInt64LE()
-
-	nintendoCreateAccountData.NNAInfo = nnaInfo
-	nintendoCreateAccountData.Token = token
-	nintendoCreateAccountData.Birthday = birthday
-	nintendoCreateAccountData.Unknown = unknown
-
-	return nil
-}
-
-// NewNintendoCreateAccountData returns a new NintendoCreateAccountData
-func NewNintendoCreateAccountData() *NintendoCreateAccountData {
-	return &NintendoCreateAccountData{}
+	NintendoCreateAccountHandler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)
 }
 
 // Setup initializes the protocol
@@ -81,7 +40,7 @@ func (accountManagementProtocol *AccountManagementProtocol) Setup() {
 }
 
 // NintendoCreateAccount sets the NintendoCreateAccount handler function
-func (accountManagementProtocol *AccountManagementProtocol) NintendoCreateAccount(handler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string, nintendoCreateAccountData *NintendoCreateAccountData)) {
+func (accountManagementProtocol *AccountManagementProtocol) NintendoCreateAccount(handler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)) {
 	accountManagementProtocol.NintendoCreateAccountHandler = handler
 }
 
@@ -100,56 +59,38 @@ func (accountManagementProtocol *AccountManagementProtocol) handleNintendoCreate
 
 	parametersStream := nex.NewStreamIn(parameters, accountManagementProtocol.server)
 
-	username, err := parametersStream.ReadString()
+	username, err := parametersStream.Read4ByteString()
 	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "", nil)
+		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
 	}
 
-	key, err := parametersStream.ReadString()
+	key, err := parametersStream.Read4ByteString()
 	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "", nil)
+		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
 	}
 
 	groups := parametersStream.ReadUInt32LE()
-	email, err := parametersStream.ReadString()
+	email, err := parametersStream.Read4ByteString()
 	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "", nil)
+		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
 	}
 
-	dataHolderName, err := parametersStream.ReadString()
+	dataHolderName, err := parametersStream.Read4ByteString()
 	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "", nil)
+		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
 	}
 
-	if dataHolderName != "NintendoCreateAccountData" {
+	if dataHolderName != "NintendoToken" {
 		err := errors.New("[AccountManagementProtocol::NintendoCreateAccount] Data holder name does not match")
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "", nil)
+		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "")
 		return
 	}
 
-	_ = parametersStream.ReadUInt32LE() // length including this field
-
-	dataHolderContent, err := parametersStream.ReadBuffer()
-	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "", nil)
-		return
-	}
-
-	dataHolderContentStream := nex.NewStreamIn(dataHolderContent, accountManagementProtocol.server)
-
-	nintendoCreateAccountDataStructureInterface, err := dataHolderContentStream.ReadStructure(NewNintendoCreateAccountData())
-	if err != nil {
-		go accountManagementProtocol.NintendoCreateAccountHandler(err, client, callID, "", "", 0, "", nil)
-		return
-	}
-
-	nintendoCreateAccountData := nintendoCreateAccountDataStructureInterface.(*NintendoCreateAccountData)
-
-	go accountManagementProtocol.NintendoCreateAccountHandler(nil, client, callID, username, key, groups, email, nintendoCreateAccountData)
+	go accountManagementProtocol.NintendoCreateAccountHandler(nil, client, callID, username, key, groups, email)
 }
 
 // NewAccountManagementProtocol returns a new AccountManagementProtocol
