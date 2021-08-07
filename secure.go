@@ -248,12 +248,6 @@ func (secureProtocol *SecureProtocol) handleRegisterEx(packet nex.PacketInterfac
 		return
 	}
 
-	if dataHolderType != "SonyNPTicket" {
-		err := errors.New("[SecureProtocol::RegisterEx] Data holder name does not match")
-		go secureProtocol.RegisterExHandler(err, client, callID, stationUrls, dataHolderType, make([]byte, 0))
-		return
-	}
-
 	if len(parametersStream.Bytes()[parametersStream.ByteOffset():]) < 8 {
 		err := errors.New("[SecureProtocol::RegisterEx] Data holder missing lengths")
 		go secureProtocol.RegisterExHandler(err, client, callID, stationUrls, dataHolderType, make([]byte, 0))
