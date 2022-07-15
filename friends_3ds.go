@@ -2,7 +2,7 @@ package nexproto
 
 import (
 	"errors"
-	"fmt"
+	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -205,7 +205,7 @@ func (friends3DSProtocol *Friends3DSProtocol) Setup() {
 			case Friends3DSMethodGetFriendPresence:
 				go friends3DSProtocol.handleGetFriendPresence(packet)
 			default:
-				fmt.Printf("Unsupported Friends (3DS) method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported Friends (3DS) method ID: %#v\n", request.MethodID())
 			}
 		}
 	})
@@ -213,7 +213,7 @@ func (friends3DSProtocol *Friends3DSProtocol) Setup() {
 
 func (friends3DSProtocol *Friends3DSProtocol) handleSyncFriend(packet nex.PacketInterface) {
 	if friends3DSProtocol.SyncFriendHandler == nil {
-		fmt.Println("[Warning] Friends3DSProtocol::SyncFriend not implemented")
+		log.Println("[Warning] Friends3DSProtocol::SyncFriend not implemented")
 		go respondNotImplemented(packet, Friends3DSProtocolID)
 		return
 	}
@@ -235,7 +235,7 @@ func (friends3DSProtocol *Friends3DSProtocol) handleSyncFriend(packet nex.Packet
 
 func (friends3DSProtocol *Friends3DSProtocol) handleGetFriendPersistentInfo(packet nex.PacketInterface) {
 	if friends3DSProtocol.GetFriendPersistentInfoHandler == nil {
-		fmt.Println("[Warning] Friends3DSProtocol::GetFriendPersistentInfo not implemented")
+		log.Println("[Warning] Friends3DSProtocol::GetFriendPersistentInfo not implemented")
 		go respondNotImplemented(packet, AuthenticationProtocolID)
 		return
 	}
@@ -255,7 +255,7 @@ func (friends3DSProtocol *Friends3DSProtocol) handleGetFriendPersistentInfo(pack
 
 func (friends3DSProtocol *Friends3DSProtocol) handleUpdatePresence(packet nex.PacketInterface) {
 	if friends3DSProtocol.UpdatePresenceHandler == nil {
-		fmt.Println("[Warning] Friends3DSProtocol::UpdatePresence not implemented")
+		log.Println("[Warning] Friends3DSProtocol::UpdatePresence not implemented")
 		go respondNotImplemented(packet, AuthenticationProtocolID)
 		return
 	}
@@ -281,7 +281,7 @@ func (friends3DSProtocol *Friends3DSProtocol) handleUpdatePresence(packet nex.Pa
 
 func (friends3DSProtocol *Friends3DSProtocol) handleAddFriendByPrincipalID(packet nex.PacketInterface) {
 	if friends3DSProtocol.AddFriendByPrincipalIDHandler == nil {
-		fmt.Println("[Warning] Friends3DSProtocol::AddFriendByPrincipalID not implemented")
+		log.Println("[Warning] Friends3DSProtocol::AddFriendByPrincipalID not implemented")
 		go respondNotImplemented(packet, AuthenticationProtocolID)
 		return
 	}
@@ -302,7 +302,7 @@ func (friends3DSProtocol *Friends3DSProtocol) handleAddFriendByPrincipalID(packe
 
 func (friends3DSProtocol *Friends3DSProtocol) handleGetFriendMii(packet nex.PacketInterface) {
 	if friends3DSProtocol.GetFriendMiiHandler == nil {
-		fmt.Println("[Warning] Friends3DSProtocol::GetFriendMiiHandler not implemented")
+		log.Println("[Warning] Friends3DSProtocol::GetFriendMiiHandler not implemented")
 		go respondNotImplemented(packet, AuthenticationProtocolID)
 		return
 	}
@@ -322,7 +322,7 @@ func (friends3DSProtocol *Friends3DSProtocol) handleGetFriendMii(packet nex.Pack
 
 func (friends3DSProtocol *Friends3DSProtocol) handleGetFriendPresence(packet nex.PacketInterface) {
 	if friends3DSProtocol.GetFriendPresenceHandler == nil {
-		fmt.Println("[Warning] Friends3DSProtocol::GetFriendPresenceHandler not implemented")
+		log.Println("[Warning] Friends3DSProtocol::GetFriendPresenceHandler not implemented")
 		go respondNotImplemented(packet, AuthenticationProtocolID)
 		return
 	}

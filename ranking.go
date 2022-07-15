@@ -1,7 +1,7 @@
 package nexproto
 
 import (
-	"fmt"
+	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -74,7 +74,7 @@ func (rankingProtocol *RankingProtocol) Setup() {
 			case RankingMethodUploadCommonData:
 				go rankingProtocol.handleUploadCommonData(packet)
 			default:
-				fmt.Printf("Unsupported Ranking method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported Ranking method ID: %#v\n", request.MethodID())
 			}
 		}
 	})
@@ -87,7 +87,7 @@ func (rankingProtocol *RankingProtocol) UploadCommonData(handler func(err error,
 
 func (rankingProtocol *RankingProtocol) handleUploadCommonData(packet nex.PacketInterface) {
 	if rankingProtocol.UploadCommonDataHandler == nil {
-		fmt.Println("[Warning] RankingProtocol::UploadCommonData not implemented")
+		log.Println("[Warning] RankingProtocol::UploadCommonData not implemented")
 		go respondNotImplemented(packet, RankingProtocolID)
 		return
 	}

@@ -1,7 +1,7 @@
 package nexproto
 
 import (
-	"fmt"
+	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -29,7 +29,7 @@ func (dataStoreSMMProtocol *DataStoreSMMProtocol) Setup() {
 			case DataStoreMethodGetMeta:
 				go dataStoreSMMProtocol.handleGetMeta(packet)
 			default:
-				fmt.Printf("Unsupported DataStoreSMM method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported DataStoreSMM method ID: %#v\n", request.MethodID())
 			}
 		}
 	})

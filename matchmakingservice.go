@@ -1,7 +1,7 @@
 package nexproto
 
 import (
-	"fmt"
+	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -54,7 +54,7 @@ func (matchmakingProtocol *MatchmakingProtocol) Setup() {
 			case TerminateGathering:
 				go matchmakingProtocol.handleTerminateGathering(packet)
 			default:
-				fmt.Printf("Unsupported Matchmaking method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported Matchmaking method ID: %#v\n", request.MethodID())
 			}
 		}
 
@@ -63,7 +63,7 @@ func (matchmakingProtocol *MatchmakingProtocol) Setup() {
 			case RegisterGathering:
 				go matchmakingProtocol.handleCheckForGatherings(packet)
 			default:
-				fmt.Printf("Unsupported Matchmaking2 method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported Matchmaking2 method ID: %#v\n", request.MethodID())
 			}
 		}
 	})
@@ -99,7 +99,7 @@ func (matchmakingProtocol *MatchmakingProtocol) CheckForGatherings(handler func(
 
 func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		fmt.Println("[Warning] MatchmakingProtocol::RegisterGatheringHandler not implemented")
+		log.Println("[Warning] MatchmakingProtocol::RegisterGatheringHandler not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -117,7 +117,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet n
 	gathering, err := parametersStream.ReadBuffer()
 
 	if err != nil {
-		fmt.Println("Could not read gathering data")
+		log.Println("Could not read gathering data")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -127,7 +127,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet n
 
 func (matchmakingProtocol *MatchmakingProtocol) handleUpdateGathering(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		fmt.Println("[Warning] MatchmakingProtocol::RegisterGatheringHandler not implemented")
+		log.Println("[Warning] MatchmakingProtocol::RegisterGatheringHandler not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -149,7 +149,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleUpdateGathering(packet nex
 	gatheringID := gatheringStream.ReadUInt32LE()
 
 	if err != nil {
-		fmt.Println("Could not read gathering data")
+		log.Println("Could not read gathering data")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -159,7 +159,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleUpdateGathering(packet nex
 
 func (matchmakingProtocol *MatchmakingProtocol) handleParticipate(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		fmt.Println("[Warning] MatchmakingProtocol::Participate not implemented")
+		log.Println("[Warning] MatchmakingProtocol::Participate not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -179,7 +179,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleParticipate(packet nex.Pac
 
 func (matchmakingProtocol *MatchmakingProtocol) handleUnparticipate(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		fmt.Println("[Warning] MatchmakingProtocol::Unparticipate not implemented")
+		log.Println("[Warning] MatchmakingProtocol::Unparticipate not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -199,7 +199,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleUnparticipate(packet nex.P
 
 func (matchmakingProtocol *MatchmakingProtocol) handleLaunchSession(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		fmt.Println("[Warning] MatchmakingProtocol::LaunchSession not implemented")
+		log.Println("[Warning] MatchmakingProtocol::LaunchSession not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -219,7 +219,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleLaunchSession(packet nex.P
 
 func (matchmakingProtocol *MatchmakingProtocol) handleTerminateGathering(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		fmt.Println("[Warning] MatchmakingProtocol::LaunchSession not implemented")
+		log.Println("[Warning] MatchmakingProtocol::LaunchSession not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -239,7 +239,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleTerminateGathering(packet 
 
 func (matchmakingProtocol *MatchmakingProtocol) handleCheckForGatherings(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		fmt.Println("[Warning] MatchmakingProtocol::LaunchSession not implemented")
+		log.Println("[Warning] MatchmakingProtocol::LaunchSession not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}

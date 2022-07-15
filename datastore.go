@@ -2,7 +2,7 @@ package nexproto
 
 import (
 	"errors"
-	"fmt"
+	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -244,7 +244,7 @@ func (dataStoreProtocol *DataStoreProtocol) Setup() {
 			case DataStoreMethodGetMeta:
 				go dataStoreProtocol.handleGetMeta(packet)
 			default:
-				fmt.Printf("Unsupported DataStore method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported DataStore method ID: %#v\n", request.MethodID())
 			}
 		}
 	})
@@ -257,7 +257,7 @@ func (dataStoreProtocol *DataStoreProtocol) GetMeta(handler func(err error, clie
 
 func (dataStoreProtocol *DataStoreProtocol) handleGetMeta(packet nex.PacketInterface) {
 	if dataStoreProtocol.GetMetaHandler == nil {
-		fmt.Println("[Warning] DataStoreProtocol::GetMeta not implemented")
+		log.Println("[Warning] DataStoreProtocol::GetMeta not implemented")
 		go respondNotImplemented(packet, DataStoreProtocolID)
 		return
 	}

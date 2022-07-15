@@ -2,7 +2,7 @@ package nexproto
 
 import (
 	"errors"
-	"fmt"
+	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -37,7 +37,7 @@ func (jsonProtocol *JsonProtocol) Setup() {
 			case JsonRequest2:
 				go jsonProtocol.handleRequest2(packet)
 			default:
-				fmt.Printf("Unsupported Secure method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported Secure method ID: %#v\n", request.MethodID())
 			}
 		}
 	})
@@ -54,7 +54,7 @@ func (jsonProtocol *JsonProtocol) JSONRequest2(handler func(err error, client *n
 
 func (jsonProtocol *JsonProtocol) handleRequest(packet nex.PacketInterface) {
 	if jsonProtocol.JSONRequestHandler == nil {
-		fmt.Println("[Warning] JsonProtocol::JSONRequest not implemented")
+		log.Println("[Warning] JsonProtocol::JSONRequest not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -85,7 +85,7 @@ func (jsonProtocol *JsonProtocol) handleRequest(packet nex.PacketInterface) {
 
 func (jsonProtocol *JsonProtocol) handleRequest2(packet nex.PacketInterface) {
 	if jsonProtocol.JSONRequestHandler == nil {
-		fmt.Println("[Warning] JsonProtocol::JSONRequest2 not implemented")
+		log.Println("[Warning] JsonProtocol::JSONRequest2 not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}

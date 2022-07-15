@@ -1,7 +1,7 @@
 package nexproto
 
 import (
-	"fmt"
+	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -28,7 +28,7 @@ func (unknownProtocol *UnknownProtocol) Setup() {
 			case UnknownMethod:
 				go unknownProtocol.handleUnknownMethod(packet)
 			default:
-				fmt.Printf("Unsupported Unknown method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported Unknown method ID: %#v\n", request.MethodID())
 			}
 		}
 	})
@@ -40,7 +40,7 @@ func (unknownProtocol *UnknownProtocol) UnknownMethod(handler func(err error, cl
 
 func (unknownProtocol *UnknownProtocol) handleUnknownMethod(packet nex.PacketInterface) {
 	if unknownProtocol.UnknownMethodHandler == nil {
-		fmt.Println("[Warning] UnknownProtocol::UnknownMethodHandler not implemented")
+		log.Println("[Warning] UnknownProtocol::UnknownMethodHandler not implemented")
 		go respondNotImplemented(packet, UnknownProtocolID)
 		return
 	}

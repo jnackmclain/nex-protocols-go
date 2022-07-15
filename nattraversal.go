@@ -1,7 +1,7 @@
 package nexproto
 
 import (
-	"fmt"
+	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -30,7 +30,7 @@ func (natTraversalProtocol *NATTraversalProtocol) Setup() {
 			case RegisterGathering:
 				go natTraversalProtocol.handleInitiateProbe(packet)
 			default:
-				fmt.Printf("Unsupported NAT traversal method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported NAT traversal method ID: %#v\n", request.MethodID())
 			}
 		}
 	})
@@ -42,7 +42,7 @@ func (natTraversalProtocol *NATTraversalProtocol) InitiateProbe(handler func(err
 
 func (natTraversalProtocol *NATTraversalProtocol) handleInitiateProbe(packet nex.PacketInterface) {
 	if natTraversalProtocol.InitiateProbeHandler == nil {
-		fmt.Println("[Warning] NATTraversal::InitiateProbe not implemented")
+		log.Println("[Warning] NATTraversal::InitiateProbe not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}

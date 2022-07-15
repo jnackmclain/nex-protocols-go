@@ -2,7 +2,7 @@ package nexproto
 
 import (
 	"errors"
-	"fmt"
+	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -679,7 +679,7 @@ func (friendsProtocol *FriendsProtocol) Setup() {
 			case FriendsMethodGetRequestBlockSettings:
 				go friendsProtocol.handleGetRequestBlockSettings(packet)
 			default:
-				fmt.Printf("Unsupported Friends (WiiU) method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported Friends (WiiU) method ID: %#v\n", request.MethodID())
 			}
 		}
 	})
@@ -787,7 +787,7 @@ func (friendsProtocol *FriendsProtocol) GetRequestBlockSettings(handler func(err
 
 func (friendsProtocol *FriendsProtocol) handleUpdateAndGetAllInformation(packet nex.PacketInterface) {
 	if friendsProtocol.UpdateAndGetAllInformationHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::UpdateAndGetAllInformation not implemented")
+		log.Println("[Warning] FriendsProtocol::UpdateAndGetAllInformation not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -821,7 +821,7 @@ func (friendsProtocol *FriendsProtocol) handleUpdateAndGetAllInformation(packet 
 
 func (friendsProtocol *FriendsProtocol) handleAddFriend(packet nex.PacketInterface) {
 	if friendsProtocol.AddFriendHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::AddFriend not implemented")
+		log.Println("[Warning] FriendsProtocol::AddFriend not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -847,7 +847,7 @@ func (friendsProtocol *FriendsProtocol) handleAddFriend(packet nex.PacketInterfa
 
 func (friendsProtocol *FriendsProtocol) handleAddFriendByName(packet nex.PacketInterface) {
 	if friendsProtocol.AddFriendByNameHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::AddFriendByName not implemented")
+		log.Println("[Warning] FriendsProtocol::AddFriendByName not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -872,7 +872,7 @@ func (friendsProtocol *FriendsProtocol) handleAddFriendByName(packet nex.PacketI
 
 func (friendsProtocol *FriendsProtocol) handleRemoveFriend(packet nex.PacketInterface) {
 	if friendsProtocol.RemoveFriendHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::RemoveFriend not implemented")
+		log.Println("[Warning] FriendsProtocol::RemoveFriend not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -898,7 +898,7 @@ func (friendsProtocol *FriendsProtocol) handleRemoveFriend(packet nex.PacketInte
 
 func (friendsProtocol *FriendsProtocol) handleAddFriendRequest(packet nex.PacketInterface) {
 	if friendsProtocol.AddFriendRequestHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::AddFriendRequest not implemented")
+		log.Println("[Warning] FriendsProtocol::AddFriendRequest not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -956,7 +956,7 @@ func (friendsProtocol *FriendsProtocol) handleAddFriendRequest(packet nex.Packet
 
 func (friendsProtocol *FriendsProtocol) handleCancelFriendRequest(packet nex.PacketInterface) {
 	if friendsProtocol.CancelFriendRequestHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::CancelFriendRequest not implemented")
+		log.Println("[Warning] FriendsProtocol::CancelFriendRequest not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -982,7 +982,7 @@ func (friendsProtocol *FriendsProtocol) handleCancelFriendRequest(packet nex.Pac
 
 func (friendsProtocol *FriendsProtocol) handleAcceptFriendRequest(packet nex.PacketInterface) {
 	if friendsProtocol.AcceptFriendRequestHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::AcceptFriendRequest not implemented")
+		log.Println("[Warning] FriendsProtocol::AcceptFriendRequest not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1008,7 +1008,7 @@ func (friendsProtocol *FriendsProtocol) handleAcceptFriendRequest(packet nex.Pac
 
 func (friendsProtocol *FriendsProtocol) handleDeleteFriendRequest(packet nex.PacketInterface) {
 	if friendsProtocol.DeleteFriendRequestHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::DeleteFriendRequest not implemented")
+		log.Println("[Warning] FriendsProtocol::DeleteFriendRequest not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1034,7 +1034,7 @@ func (friendsProtocol *FriendsProtocol) handleDeleteFriendRequest(packet nex.Pac
 
 func (friendsProtocol *FriendsProtocol) handleDenyFriendRequest(packet nex.PacketInterface) {
 	if friendsProtocol.DenyFriendRequestHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::DenyFriendRequest not implemented")
+		log.Println("[Warning] FriendsProtocol::DenyFriendRequest not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1060,7 +1060,7 @@ func (friendsProtocol *FriendsProtocol) handleDenyFriendRequest(packet nex.Packe
 
 func (friendsProtocol *FriendsProtocol) handleMarkFriendRequestsAsReceived(packet nex.PacketInterface) {
 	if friendsProtocol.MarkFriendRequestsAsReceivedHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::MarkFriendRequestsAsReceived not implemented")
+		log.Println("[Warning] FriendsProtocol::MarkFriendRequestsAsReceived not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1086,7 +1086,7 @@ func (friendsProtocol *FriendsProtocol) handleMarkFriendRequestsAsReceived(packe
 
 func (friendsProtocol *FriendsProtocol) handleAddBlackList(packet nex.PacketInterface) {
 	if friendsProtocol.AddBlackListHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::AddBlackList not implemented")
+		log.Println("[Warning] FriendsProtocol::AddBlackList not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1112,7 +1112,7 @@ func (friendsProtocol *FriendsProtocol) handleAddBlackList(packet nex.PacketInte
 
 func (friendsProtocol *FriendsProtocol) handleRemoveBlackList(packet nex.PacketInterface) {
 	if friendsProtocol.RemoveBlackListHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::RemoveBlackList not implemented")
+		log.Println("[Warning] FriendsProtocol::RemoveBlackList not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1138,7 +1138,7 @@ func (friendsProtocol *FriendsProtocol) handleRemoveBlackList(packet nex.PacketI
 
 func (friendsProtocol *FriendsProtocol) handleUpdatePresence(packet nex.PacketInterface) {
 	if friendsProtocol.UpdatePresenceHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::UpdatePresence not implemented")
+		log.Println("[Warning] FriendsProtocol::UpdatePresence not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1164,7 +1164,7 @@ func (friendsProtocol *FriendsProtocol) handleUpdatePresence(packet nex.PacketIn
 
 func (friendsProtocol *FriendsProtocol) handleUpdateMii(packet nex.PacketInterface) {
 	if friendsProtocol.UpdateMiiHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::UpdateMii not implemented")
+		log.Println("[Warning] FriendsProtocol::UpdateMii not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1190,7 +1190,7 @@ func (friendsProtocol *FriendsProtocol) handleUpdateMii(packet nex.PacketInterfa
 
 func (friendsProtocol *FriendsProtocol) handleUpdateComment(packet nex.PacketInterface) {
 	if friendsProtocol.UpdateCommentHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::UpdateComment not implemented")
+		log.Println("[Warning] FriendsProtocol::UpdateComment not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1216,7 +1216,7 @@ func (friendsProtocol *FriendsProtocol) handleUpdateComment(packet nex.PacketInt
 
 func (friendsProtocol *FriendsProtocol) handleUpdatePreference(packet nex.PacketInterface) {
 	if friendsProtocol.UpdatePreferenceHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::UpdatePreference not implemented")
+		log.Println("[Warning] FriendsProtocol::UpdatePreference not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1242,7 +1242,7 @@ func (friendsProtocol *FriendsProtocol) handleUpdatePreference(packet nex.Packet
 
 func (friendsProtocol *FriendsProtocol) handleGetBasicInfo(packet nex.PacketInterface) {
 	if friendsProtocol.GetBasicInfoHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::GetBasicInfo not implemented")
+		log.Println("[Warning] FriendsProtocol::GetBasicInfo not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1268,7 +1268,7 @@ func (friendsProtocol *FriendsProtocol) handleGetBasicInfo(packet nex.PacketInte
 
 func (friendsProtocol *FriendsProtocol) handleDeleteFriendFlags(packet nex.PacketInterface) {
 	if friendsProtocol.DeleteFriendFlagsHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::DeleteFriendFlags not implemented")
+		log.Println("[Warning] FriendsProtocol::DeleteFriendFlags not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1293,7 +1293,7 @@ func (friendsProtocol *FriendsProtocol) handleDeleteFriendFlags(packet nex.Packe
 
 func (friendsProtocol *FriendsProtocol) handleCheckSettingStatus(packet nex.PacketInterface) {
 	if friendsProtocol.CheckSettingStatusHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::CheckSettingStatus not implemented")
+		log.Println("[Warning] FriendsProtocol::CheckSettingStatus not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}
@@ -1308,7 +1308,7 @@ func (friendsProtocol *FriendsProtocol) handleCheckSettingStatus(packet nex.Pack
 
 func (friendsProtocol *FriendsProtocol) handleGetRequestBlockSettings(packet nex.PacketInterface) {
 	if friendsProtocol.GetRequestBlockSettingsHandler == nil {
-		fmt.Println("[Warning] FriendsProtocol::GetRequestBlockSettings not implemented")
+		log.Println("[Warning] FriendsProtocol::GetRequestBlockSettings not implemented")
 		go respondNotImplemented(packet, FriendsProtocolID)
 		return
 	}

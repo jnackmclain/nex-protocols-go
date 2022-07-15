@@ -2,7 +2,7 @@ package nexproto
 
 import (
 	"errors"
-	"fmt"
+	"log"
 
 	nex "github.com/ihatecompvir/nex-go"
 )
@@ -33,7 +33,7 @@ func (accountManagementProtocol *AccountManagementProtocol) Setup() {
 			case AccountManagementMethodNintendoCreateAccount:
 				go accountManagementProtocol.handleNintendoCreateAccountHandler(packet)
 			default:
-				fmt.Printf("Unsupported AccountManagement method ID: %#v\n", request.MethodID())
+				log.Printf("Unsupported AccountManagement method ID: %#v\n", request.MethodID())
 			}
 		}
 	})
@@ -46,7 +46,7 @@ func (accountManagementProtocol *AccountManagementProtocol) NintendoCreateAccoun
 
 func (accountManagementProtocol *AccountManagementProtocol) handleNintendoCreateAccountHandler(packet nex.PacketInterface) {
 	if accountManagementProtocol.NintendoCreateAccountHandler == nil {
-		fmt.Println("[Warning] AccountManagementProtocol::NintendoCreateAccount not implemented")
+		log.Println("[Warning] AccountManagementProtocol::NintendoCreateAccount not implemented")
 		go respondNotImplemented(packet, AccountManagementProtocolID)
 		return
 	}
