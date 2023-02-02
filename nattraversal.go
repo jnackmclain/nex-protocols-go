@@ -9,14 +9,15 @@ import (
 const (
 	NATTraversalID = 0x3 // the first matchmaking service protocol
 
-	InitiateProbe = 0x1
+	RequestProbeInitiation = 0x1
+	InitiateProbe          = 0x2
 )
 
 // JsonProtocol handles the Json requests
 type NATTraversalProtocol struct {
-	server               *nex.Server
-	ConnectionIDCounter  *nex.Counter
-	InitiateProbeHandler func(err error, client *nex.Client, callID uint32, stationURL string)
+	server                        *nex.Server
+	ConnectionIDCounter           *nex.Counter
+	RequestProbeInitiationHandler func(err error, client *nex.Client, callID uint32, stationURLs []string)
 }
 
 func (natTraversalProtocol *NATTraversalProtocol) Setup() {
@@ -28,7 +29,7 @@ func (natTraversalProtocol *NATTraversalProtocol) Setup() {
 		if NATTraversalID == request.ProtocolID() {
 			switch request.MethodID() {
 			case RegisterGathering:
-				go natTraversalProtocol.handleInitiateProbe(packet)
+				go natTraversalProtocol.handleRequestProbeInitiation(packet)
 			default:
 				log.Printf("Unsupported NAT traversal method ID: %#v\n", request.MethodID())
 			}
@@ -36,13 +37,13 @@ func (natTraversalProtocol *NATTraversalProtocol) Setup() {
 	})
 }
 
-func (natTraversalProtocol *NATTraversalProtocol) InitiateProbe(handler func(err error, client *nex.Client, callID uint32, stationURL string)) {
-	natTraversalProtocol.InitiateProbeHandler = handler
+func (natTraversalProtocol *NATTraversalProtocol) RequestProbeInitiation(handler func(err error, client *nex.Client, callID uint32, stationURLs []string)) {
+	natTraversalProtocol.RequestProbeInitiationHandler = handler
 }
 
-func (natTraversalProtocol *NATTraversalProtocol) handleInitiateProbe(packet nex.PacketInterface) {
-	if natTraversalProtocol.InitiateProbeHandler == nil {
-		log.Println("[Warning] NATTraversal::InitiateProbe not implemented")
+func (natTraversalProtocol *NATTraversalProtocol) handleRequestProbeInitiation(packet nex.PacketInterface) {
+	if natTraversalProtocol.RequestProbeInitiationHandler == nil {
+		log.Println("[Warning] NATTraversal::RequestProbeInitiation not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -55,14 +56,21 @@ func (natTraversalProtocol *NATTraversalProtocol) handleInitiateProbe(packet nex
 
 	parametersStream := NewStreamIn(parameters, natTraversalProtocol.server)
 
-	parametersStream.ReadUInt32LE()
-	stationURL, err := parametersStream.Read4ByteString()
+	numStationURLs := parametersStream.ReadUInt32LE()
+	urlSlice := make([]string, numStationURLs)
 
-	if err != nil {
-		go natTraversalProtocol.InitiateProbeHandler(nil, client, callID, "")
+	for i := 0; i < int(numStationURLs); i++ {
+		url, err := parametersStream.Read4ByteString()
+
+		if err != nil {
+			go natTraversalProtocol.RequestProbeInitiationHandler(nil, client, callID, make([]string, 0))
+			return
+		}
+
+		urlSlice[i] = url
 	}
 
-	go natTraversalProtocol.InitiateProbeHandler(nil, client, callID, stationURL)
+	go natTraversalProtocol.RequestProbeInitiationHandler(nil, client, callID, urlSlice)
 }
 
 // NewSecureProtocol returns a new SecureProtocol
