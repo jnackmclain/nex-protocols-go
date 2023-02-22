@@ -7,16 +7,15 @@ import (
 )
 
 const (
-	MatchmakingProtocolID  = 0x15 // the first matchmaking service protocol
-	MatchmakingProtocolID2 = 0x6E // the second matchmaking service? if there is a joinable gathering, this returns it
+	MatchmakingProtocolID = 0x15 // the first matchmaking service protocol
 
-	RegisterGathering  = 0x1  // creates an empty gathering, also CheckForGatherings
+	RegisterGathering  = 0x1  // registers a gathering with the server
 	TerminateGathering = 0x2  // ends a gathering
 	UpdateGathering    = 0x4  // updates a gathering
 	Participate        = 0xB  // unsure on this one, going off NintendoClients wiki for the name
 	Unparticipate      = 0xC  // unsure on this one, going off NintendoClients wiki for the name
 	LaunchSession      = 0x1A // unsure on this one, going off NintendoClients wiki for the name
-	SetState           = 0x1E
+	SetState           = 0x1E // sets the state of a gathering
 )
 
 // JsonProtocol handles the Json requests
@@ -30,9 +29,6 @@ type MatchmakingProtocol struct {
 	LaunchSessionHandler      func(err error, client *nex.Client, callID uint32, gatheringID uint32)
 	TerminateGatheringHandler func(err error, client *nex.Client, callID uint32, gatheringID uint32)
 	SetStateHandler           func(err error, client *nex.Client, callID uint32, gatheringID uint32, state uint32)
-
-	// second handler
-	CheckForGatheringsHandler func(err error, client *nex.Client, callID uint32, data []byte)
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) Setup() {
@@ -59,15 +55,6 @@ func (matchmakingProtocol *MatchmakingProtocol) Setup() {
 				go matchmakingProtocol.handleSetState(packet)
 			default:
 				log.Printf("Unsupported Matchmaking method ID: %#v\n", request.MethodID())
-			}
-		}
-
-		if MatchmakingProtocolID2 == request.ProtocolID() {
-			switch request.MethodID() {
-			case RegisterGathering:
-				go matchmakingProtocol.handleCheckForGatherings(packet)
-			default:
-				log.Printf("Unsupported Matchmaking2 method ID: %#v\n", request.MethodID())
 			}
 		}
 	})
@@ -97,17 +84,13 @@ func (matchmakingProtocol *MatchmakingProtocol) TerminateGathering(handler func(
 	matchmakingProtocol.TerminateGatheringHandler = handler
 }
 
-func (matchmakingProtocol *MatchmakingProtocol) CheckForGatherings(handler func(err error, client *nex.Client, callID uint32, data []byte)) {
-	matchmakingProtocol.CheckForGatheringsHandler = handler
-}
-
 func (matchmakingProtocol *MatchmakingProtocol) SetState(handler func(err error, client *nex.Client, callID uint32, gatheringID uint32, state uint32)) {
 	matchmakingProtocol.SetStateHandler = handler
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		log.Println("[Warning] MatchmakingProtocol::RegisterGatheringHandler not implemented")
+		log.Println("[Warning] MatchmakingProtocol::RegisterGathering not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -135,7 +118,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleRegisterGathering(packet n
 
 func (matchmakingProtocol *MatchmakingProtocol) handleUpdateGathering(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		log.Println("[Warning] MatchmakingProtocol::UpdateGatheringHandler not implemented")
+		log.Println("[Warning] MatchmakingProtocol::UpdateGathering not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -227,7 +210,7 @@ func (matchmakingProtocol *MatchmakingProtocol) handleLaunchSession(packet nex.P
 
 func (matchmakingProtocol *MatchmakingProtocol) handleTerminateGathering(packet nex.PacketInterface) {
 	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		log.Println("[Warning] MatchmakingProtocol::LaunchSession not implemented")
+		log.Println("[Warning] MatchmakingProtocol::TerminateGathering not implemented")
 		go respondNotImplemented(packet, SecureProtocolID)
 		return
 	}
@@ -243,26 +226,6 @@ func (matchmakingProtocol *MatchmakingProtocol) handleTerminateGathering(packet 
 	gatheringID := parametersStream.ReadUInt32LE()
 
 	go matchmakingProtocol.TerminateGatheringHandler(nil, client, callID, gatheringID)
-}
-
-func (matchmakingProtocol *MatchmakingProtocol) handleCheckForGatherings(packet nex.PacketInterface) {
-	if matchmakingProtocol.RegisterGatheringHandler == nil {
-		log.Println("[Warning] MatchmakingProtocol::LaunchSession not implemented")
-		go respondNotImplemented(packet, SecureProtocolID)
-		return
-	}
-
-	client := packet.Sender()
-	request := packet.RMCRequest()
-
-	callID := request.CallID()
-	parameters := request.Parameters()
-
-	//parametersStream := NewStreamIn(parameters, matchmakingProtocol.server)
-
-	//gatheringID := parametersStream.ReadUInt32LE()
-
-	go matchmakingProtocol.CheckForGatheringsHandler(nil, client, callID, parameters)
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleSetState(packet nex.PacketInterface) {

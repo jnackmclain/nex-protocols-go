@@ -11,14 +11,15 @@ const (
 	// AccountManagementProtocolID is the protocol ID for the Account Management protocol
 	AccountManagementProtocolID = 0x19
 
-	// AccountManagementMethodNintendoCreateAccount is the method ID for the method NintendoCreateAccount
-	AccountManagementMethodNintendoCreateAccount = 0x1B
+	SetStatus             = 0x11
+	NintendoCreateAccount = 0x1B
 )
 
 // AccountManagementProtocol handles the Account Management nex protocol
 type AccountManagementProtocol struct {
 	server                       *nex.Server
 	NintendoCreateAccountHandler func(err error, client *nex.Client, callID uint32, username string, key string, groups uint32, email string)
+	SetStatusHandler             func(err error, client *nex.Client, callID uint32, status string)
 }
 
 // Setup initializes the protocol
@@ -30,8 +31,10 @@ func (accountManagementProtocol *AccountManagementProtocol) Setup() {
 
 		if AccountManagementProtocolID == request.ProtocolID() {
 			switch request.MethodID() {
-			case AccountManagementMethodNintendoCreateAccount:
-				go accountManagementProtocol.handleNintendoCreateAccountHandler(packet)
+			case NintendoCreateAccount:
+				go accountManagementProtocol.handleNintendoCreateAccount(packet)
+			case SetStatus:
+				go accountManagementProtocol.handleSetStatus(packet)
 			default:
 				log.Printf("Unsupported AccountManagement method ID: %#v\n", request.MethodID())
 			}
@@ -44,7 +47,12 @@ func (accountManagementProtocol *AccountManagementProtocol) NintendoCreateAccoun
 	accountManagementProtocol.NintendoCreateAccountHandler = handler
 }
 
-func (accountManagementProtocol *AccountManagementProtocol) handleNintendoCreateAccountHandler(packet nex.PacketInterface) {
+// SetStatus sets the SetStatus handler function
+func (accountManagementProtocol *AccountManagementProtocol) SetStatus(handler func(err error, client *nex.Client, callID uint32, status string)) {
+	accountManagementProtocol.SetStatusHandler = handler
+}
+
+func (accountManagementProtocol *AccountManagementProtocol) handleNintendoCreateAccount(packet nex.PacketInterface) {
 	if accountManagementProtocol.NintendoCreateAccountHandler == nil {
 		log.Println("[Warning] AccountManagementProtocol::NintendoCreateAccount not implemented")
 		go respondNotImplemented(packet, AccountManagementProtocolID)
@@ -91,6 +99,30 @@ func (accountManagementProtocol *AccountManagementProtocol) handleNintendoCreate
 	}
 
 	go accountManagementProtocol.NintendoCreateAccountHandler(nil, client, callID, username, key, groups, email)
+}
+
+func (accountManagementProtocol *AccountManagementProtocol) handleSetStatus(packet nex.PacketInterface) {
+	if accountManagementProtocol.NintendoCreateAccountHandler == nil {
+		log.Println("[Warning] AccountManagementProtocol::SetStatus not implemented")
+		go respondNotImplemented(packet, AccountManagementProtocolID)
+		return
+	}
+
+	client := packet.Sender()
+	request := packet.RMCRequest()
+
+	callID := request.CallID()
+	parameters := request.Parameters()
+
+	parametersStream := nex.NewStreamIn(parameters, accountManagementProtocol.server)
+
+	status, err := parametersStream.Read4ByteString()
+	if err != nil {
+		go accountManagementProtocol.SetStatusHandler(err, client, callID, "")
+		return
+	}
+
+	go accountManagementProtocol.SetStatusHandler(nil, client, callID, status)
 }
 
 // NewAccountManagementProtocol returns a new AccountManagementProtocol

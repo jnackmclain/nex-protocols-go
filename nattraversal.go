@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	NATTraversalID = 0x3 // the first matchmaking service protocol
+	NATTraversalProtocolID = 0x3 // the first matchmaking service protocol
 
 	RequestProbeInitiation = 0x1
 	InitiateProbe          = 0x2
@@ -26,7 +26,7 @@ func (natTraversalProtocol *NATTraversalProtocol) Setup() {
 	nexServer.On("Data", func(packet nex.PacketInterface) {
 		request := packet.RMCRequest()
 
-		if NATTraversalID == request.ProtocolID() {
+		if NATTraversalProtocolID == request.ProtocolID() {
 			switch request.MethodID() {
 			case RegisterGathering:
 				go natTraversalProtocol.handleRequestProbeInitiation(packet)
