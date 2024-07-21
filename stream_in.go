@@ -1,10 +1,10 @@
 package nexproto
 
 import (
-	nex "github.com/ihatecompvir/nex-go"
+	nex "github.com/jnackmclain/nex-go"
 )
 
-// StreamIn is an abstraction of StreamIn from github.com/ihatecompvir/nex-go
+// StreamIn is an abstraction of StreamIn from github.com/jnackmclain/nex-go
 // Adds protocol-specific Structure list support
 type StreamIn struct {
 	*nex.StreamIn
