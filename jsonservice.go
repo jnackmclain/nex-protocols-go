@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	nex "github.com/ihatecompvir/nex-go"
+	nex "github.com/jnackmclain/nex-go"
 )
 
 const (
@@ -29,6 +29,8 @@ func (jsonProtocol *JsonProtocol) Setup() {
 
 	nexServer.On("Data", func(packet nex.PacketInterface) {
 		request := packet.RMCRequest()
+
+		log.Println(request)
 
 		if JsonProtocolID == request.ProtocolID() {
 			switch request.MethodID() {
