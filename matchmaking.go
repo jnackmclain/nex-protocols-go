@@ -174,7 +174,6 @@ func (matchmakingProtocol *MatchmakingProtocol) handleParticipate(packet nex.Pac
 	gatheringID := parametersStream.ReadUInt32LE()
 
 	go matchmakingProtocol.ParticipateHandler(nil, client, callID, gatheringID)
-	
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleUnparticipate(packet nex.PacketInterface) {
@@ -195,7 +194,6 @@ func (matchmakingProtocol *MatchmakingProtocol) handleUnparticipate(packet nex.P
 	gatheringID := parametersStream.ReadUInt32LE()
 
 	go matchmakingProtocol.UnparticipateHandler(nil, client, callID, gatheringID)
-
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleLaunchSession(packet nex.PacketInterface) {
@@ -216,7 +214,6 @@ func (matchmakingProtocol *MatchmakingProtocol) handleLaunchSession(packet nex.P
 	gatheringID := parametersStream.ReadUInt32LE()
 
 	go matchmakingProtocol.LaunchSessionHandler(nil, client, callID, gatheringID)
-
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleTerminateGathering(packet nex.PacketInterface) {
@@ -237,7 +234,6 @@ func (matchmakingProtocol *MatchmakingProtocol) handleTerminateGathering(packet 
 	gatheringID := parametersStream.ReadUInt32LE()
 
 	go matchmakingProtocol.TerminateGatheringHandler(nil, client, callID, gatheringID)
-
 }
 
 func (matchmakingProtocol *MatchmakingProtocol) handleSetState(packet nex.PacketInterface) {

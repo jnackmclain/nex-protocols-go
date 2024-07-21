@@ -30,8 +30,6 @@ func (jsonProtocol *JsonProtocol) Setup() {
 	nexServer.On("Data", func(packet nex.PacketInterface) {
 		request := packet.RMCRequest()
 
-		log.Println(request)
-
 		if JsonProtocolID == request.ProtocolID() {
 			switch request.MethodID() {
 			case JsonRequest:
